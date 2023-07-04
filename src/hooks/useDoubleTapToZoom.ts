@@ -1,19 +1,7 @@
-/**
- * Copyright (c) JOB TODAY S.A. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
+import React, { useCallback } from 'react';
+import { NativeSyntheticEvent, NativeTouchEvent, ScrollView } from 'react-native';
 
-import React, { useCallback } from "react";
-import {
-  ScrollView,
-  NativeTouchEvent,
-  NativeSyntheticEvent,
-} from "react-native";
-
-import { Dimensions } from "../@types";
+import { Dimensions } from '../@types';
 
 const DOUBLE_TAP_DELAY = 300;
 let lastTapTS: number | null = null;
@@ -25,7 +13,7 @@ let lastTapTS: number | null = null;
 function useDoubleTapToZoom(
   scrollViewRef: React.RefObject<ScrollView>,
   scaled: boolean,
-  screen: Dimensions
+  screen: Dimensions,
 ) {
   const handleDoubleTap = useCallback(
     (event: NativeSyntheticEvent<NativeTouchEvent>) => {
@@ -60,7 +48,7 @@ function useDoubleTapToZoom(
         lastTapTS = nowTS;
       }
     },
-    [scaled]
+    [scaled],
   );
 
   return handleDoubleTap;

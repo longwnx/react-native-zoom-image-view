@@ -1,13 +1,5 @@
-/**
- * Copyright (c) JOB TODAY S.A. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-import React from "react";
-import { Image, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import React from 'react';
+import { Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 type Props = {
   images: string[];
@@ -43,16 +35,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 0,
     paddingLeft: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   button: {
-    marginRight: 10
+    marginRight: 10,
   },
   image: {
     width: IMAGE_WIDTH,
     height: IMAGE_HEIGH,
-    borderRadius: 10
-  }
+    borderRadius: 10,
+  },
 });
 
 export default ImageList;

@@ -1,19 +1,5 @@
-/**
- * Copyright (c) JOB TODAY S.A. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-import React from "react";
-import {
-  StyleSheet,
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity
-} from "react-native";
+import React from 'react';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   title?: string;
@@ -40,41 +26,41 @@ const ImageHeader = ({ title, onRequestClose }: Props) => (
 
 const styles = StyleSheet.create({
   root: {
-    backgroundColor: "#00000077"
+    backgroundColor: '#00000077',
   },
   container: {
     flex: 1,
     padding: 8,
-    flexDirection: "row",
-    justifyContent: "space-between"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   space: {
     width: 45,
-    height: 45
+    height: 45,
   },
   closeButton: {
     width: 45,
     height: 45,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   closeText: {
     lineHeight: 25,
     fontSize: 25,
     paddingTop: 2,
     includeFontPadding: false,
-    color: "#FFF"
+    color: '#FFF',
   },
   text: {
     maxWidth: 240,
     marginTop: 12,
     flex: 1,
-    flexWrap: "wrap",
-    textAlign: "center",
+    flexWrap: 'wrap',
+    textAlign: 'center',
     fontSize: 17,
     lineHeight: 17,
-    color: "#FFF"
-  }
+    color: '#FFF',
+  },
 });
 
 export default ImageHeader;

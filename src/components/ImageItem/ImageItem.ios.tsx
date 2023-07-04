@@ -1,12 +1,4 @@
-/**
- * Copyright (c) JOB TODAY S.A. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   Animated,
@@ -14,6 +6,7 @@ import {
   GestureResponderEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  PanResponder,
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
@@ -23,11 +16,11 @@ import {
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
 import useImageDimensions from '../../hooks/useImageDimensions';
 
-import { getImageStyles, getImageTransform } from 'utils';
-import type { ImageSource } from '@types';
+import { getImageStyles, getImageTransform } from '../../utils';
+import type { ImageSource } from '../../@types';
 import { ImageLoading } from './ImageLoading';
 
-const SWIPE_CLOSE_OFFSET = 75;
+const SWIPE_CLOSE_OFFSET = 50;
 const SWIPE_CLOSE_VELOCITY = 1.55;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
@@ -62,7 +55,39 @@ const ImageItem = ({
   const scrollValueY = new Animated.Value(0);
   const scaleValue = new Animated.Value(scale || 1);
   const translateValue = new Animated.ValueXY(translate);
-  const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
+  const maxScale = scale && scale > 0 ? Math.max(1 / scale, 2) : 1;
+  const viewRef = useRef(null);
+
+  const panResponder = PanResponder.create({
+    onPanResponderRelease: (_e, gestureState) => {
+      // Xử lý sự kiện vuốt xuống tại đây
+      // onRequestClose()
+      const { dx, dy } = gestureState;
+
+      // Xác định hướng vuốt dựa trên khoảng cách ngang và dọc
+      if (Math.abs(dx) > Math.abs(dy)) {
+        // Vuốt ngang
+        if (dx > 0) {
+          // Vuốt sang phải
+          console.log('Swiped right!');
+        } else {
+          // Vuốt sang trái
+          console.log('Swiped left!');
+        }
+      } else {
+        // Vuốt dọc
+        if (dy > 100) {
+          // Vuốt xuống
+          scrollValueY.setValue(0);
+          onRequestClose();
+          console.log('Swiped down!', dy);
+        } else {
+          // Vuốt lên
+          console.log('Swiped up!');
+        }
+      }
+    },
+  });
 
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
@@ -89,49 +114,47 @@ const ImageItem = ({
         Math.abs(velocityY) > SWIPE_CLOSE_VELOCITY
       ) {
         onRequestClose();
+
       }
+
     },
     [scaled],
   );
-
-  const onScroll = ({
-                      nativeEvent,
-                    }: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = nativeEvent?.contentOffset?.y ?? 0;
-
-    if (nativeEvent?.zoomScale > 1) {
-      return;
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ x: 0, y: 0, animated: true });
     }
+  }, [loaded]);
 
-    scrollValueY.setValue(offsetY);
-  };
 
   const onLongPressHandler = useCallback(
-    (event: GestureResponderEvent) => {
+    (_event: GestureResponderEvent) => {
       onLongPress(imageSrc);
     },
     [imageSrc, onLongPress],
   );
 
   return (
-    <View>
+    <View ref={viewRef}>
       <ScrollView
+        {...panResponder.panHandlers}
         ref={scrollViewRef}
         style={styles.listItem}
         pinchGestureEnabled
+        // contentOffset={{ x: 0, y: contentOffsetY }}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         maximumZoomScale={maxScale}
         contentContainerStyle={styles.imageScrollContainer}
-        scrollEnabled={swipeToCloseEnabled}
+        scrollEnabled={true}
         onScrollEndDrag={onScrollEndDrag}
+        // scrollIndicatorInsets={{top: 0, bottom: 0}}
         scrollEventThrottle={1}
-        {...(swipeToCloseEnabled && {
-          onScroll,
-        })}
+
       >
         {(!loaded || !imageDimensions) && <ImageLoading />}
         <TouchableWithoutFeedback
+          style={{ backgroundColor: 'green' }}
           onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
           onLongPress={onLongPressHandler}
           delayLongPress={delayLongPress}
@@ -151,6 +174,8 @@ const styles = StyleSheet.create({
   listItem: {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
+    alignContent: 'center',
+
   },
   imageScrollContainer: {
     height: SCREEN_HEIGHT,
