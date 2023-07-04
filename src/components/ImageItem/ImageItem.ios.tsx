@@ -89,13 +89,13 @@ const ImageItem = ({
   const onScroll = ({
                       nativeEvent,
                     }: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = nativeEvent?.contentOffset?.y ?? 0;
+    // const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
     if (nativeEvent?.zoomScale > 1) {
       return;
     }
 
-    scrollValueY.setValue(offsetY);
+    // scrollValueY.setValue(offsetY);
   };
 
   const onLongPressHandler = useCallback(
