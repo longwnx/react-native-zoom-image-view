@@ -1,4 +1,12 @@
-import { useEffect, useMemo } from 'react';
+/**
+ * Copyright (c) JOB TODAY S.A. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+import { useMemo, useEffect, useRef } from "react";
 import {
   Animated,
   Dimensions,
@@ -6,17 +14,17 @@ import {
   GestureResponderHandlers,
   NativeTouchEvent,
   PanResponderGestureState,
-} from 'react-native';
+} from "react-native";
 
-import type { Position } from 'types/Image';
+import { Position } from "../@types";
 import {
   createPanResponder,
   getDistanceBetweenTouches,
-  getImageDimensionsByTranslate,
   getImageTranslate,
-} from '@utils/index';
+  getImageDimensionsByTranslate,
+} from "../utils";
 
-const SCREEN = Dimensions.get('window');
+const SCREEN = Dimensions.get("window");
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 const MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -104,7 +112,7 @@ const usePanResponder = ({
 
   useEffect(() => {
     scaleValue.addListener(({ value }) => {
-      if (typeof onZoom === 'function') {
+      if (typeof onZoom === "function") {
         onZoom(value !== initialScale);
       }
     });
@@ -272,8 +280,9 @@ const usePanResponder = ({
       if (isTapGesture && currentScale > initialScale) {
         const { x, y } = currentTranslate;
         const { dx, dy } = gestureState;
-        const [topBound, leftBound, bottomBound, rightBound] =
-          getBounds(currentScale);
+        const [topBound, leftBound, bottomBound, rightBound] = getBounds(
+          currentScale
+        );
 
         let nextTranslateX = x + dx;
         let nextTranslateY = y + dy;
@@ -338,8 +347,9 @@ const usePanResponder = ({
 
       if (tmpTranslate) {
         const { x, y } = tmpTranslate;
-        const [topBound, leftBound, bottomBound, rightBound] =
-          getBounds(currentScale);
+        const [topBound, leftBound, bottomBound, rightBound] = getBounds(
+          currentScale
+        );
 
         let nextTranslateX = x;
         let nextTranslateY = y;

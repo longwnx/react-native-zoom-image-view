@@ -6,11 +6,12 @@
  *
  */
 
-import { useState } from 'react';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import type { DimensionsScreens } from 'types/Image';
+import { useState } from "react";
+import { NativeSyntheticEvent, NativeScrollEvent } from "react-native";
 
-const useImageIndexChange = (imageIndex: number, screen: DimensionsScreens) => {
+import { Dimensions } from "../@types";
+
+const useImageIndexChange = (imageIndex: number, screen: Dimensions) => {
   const [currentImageIndex, setImageIndex] = useState(imageIndex);
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const {

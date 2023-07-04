@@ -36,9 +36,12 @@
     "bootstrap": "yarn example && yarn install"
   },
   "keywords": [
+    "react",
     "react-native",
-    "ios",
-    "android"
+    "image",
+    "gallery",
+    "image-gallery",
+    "image-viewer"
   ],
   "repository": "https://github.com/longwnx/react-native-zoom-image-view",
   "author": "Long Nguyen Xuan <nxl232@gmail.com> (https://github.com/longwnx)",

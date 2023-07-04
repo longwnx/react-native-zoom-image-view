@@ -1,22 +1,22 @@
-import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
-import {
-  Dimensions,
-  Modal,
-  ModalProps,
-  StyleSheet,
-  View,
-  VirtualizedList,
-} from 'react-native';
-import Animated from 'react-native-reanimated';
+/**
+ * Copyright (c) JOB TODAY S.A. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
 
-import ImageItem from '@components/ImageItem/ImageItem';
-import ImageDefaultHeader from '@components/ImageDefaultHeader';
-import StatusBarManager from '@components/StatusBarManager';
+import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
+import { Animated, Dimensions, Modal, ModalProps, StyleSheet, View, VirtualizedList } from 'react-native';
+
+import ImageItem from './components/ImageItem/ImageItem';
+import ImageDefaultHeader from './components/ImageDefaultHeader';
+import StatusBarManager from './components/StatusBarManager';
 
 import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
-import useRequestClose from '@hooks/useRequestClose';
-import type { ImageSource } from '@types';
+import useRequestClose from './hooks/useRequestClose';
+import { ImageSource } from './@types';
 
 type Props = {
   images: ImageSource[];
@@ -42,23 +42,24 @@ const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
 
-function ImageViewing({
-  images,
-  keyExtractor,
-  imageIndex,
-  visible,
-  onRequestClose,
-  onLongPress = () => undefined,
-  onImageIndexChange,
-  animationType = DEFAULT_ANIMATION_TYPE,
-  backgroundColor = DEFAULT_BG_COLOR,
-  presentationStyle,
-  swipeToCloseEnabled,
-  doubleTapToZoomEnabled,
-  delayLongPress = DEFAULT_DELAY_LONG_PRESS,
-  HeaderComponent,
-  FooterComponent,
-}: Props) {
+function ImageView({
+                     images,
+                     keyExtractor,
+                     imageIndex,
+                     visible,
+                     onRequestClose,
+                     onLongPress = () => {
+                     },
+                     onImageIndexChange,
+                     animationType = DEFAULT_ANIMATION_TYPE,
+                     backgroundColor = DEFAULT_BG_COLOR,
+                     presentationStyle,
+                     swipeToCloseEnabled,
+                     doubleTapToZoomEnabled,
+                     delayLongPress = DEFAULT_DELAY_LONG_PRESS,
+                     HeaderComponent,
+                     FooterComponent,
+                   }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -69,14 +70,15 @@ function ImageViewing({
     if (onImageIndexChange) {
       onImageIndexChange(currentImageIndex);
     }
-  }, [currentImageIndex, onImageIndexChange]);
+  }, [currentImageIndex]);
 
   const onZoom = useCallback(
     (isScaled: boolean) => {
+      // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
-    [toggleBarsVisible]
+    [imageList],
   );
 
   if (!visible) {
@@ -115,14 +117,14 @@ function ImageViewing({
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           initialScrollIndex={imageIndex}
-          getItem={(_: never, index: number) => images[index]}
+          getItem={(_: any, index: number) => images[index]}
           getItemCount={() => images.length}
-          getItemLayout={(_: never, index: number) => ({
+          getItemLayout={(_: any, index: number) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }: { item: { imageSrc: string } }) => (
+          renderItem={({ item: imageSrc }) => (
             <ImageItem
               onZoom={onZoom}
               imageSrc={imageSrc}
@@ -134,12 +136,13 @@ function ImageViewing({
             />
           )}
           onMomentumScrollEnd={onScroll}
+          //@ts-ignore
           keyExtractor={(imageSrc, index) =>
             keyExtractor
               ? keyExtractor(imageSrc, index)
               : typeof imageSrc === 'number'
-              ? `${imageSrc}`
-              : imageSrc.uri
+                ? `${imageSrc}`
+                : imageSrc.uri
           }
         />
         {typeof FooterComponent !== 'undefined' && (
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
 });
 
 const EnhancedImageViewing = (props: Props) => (
-  <ImageViewing key={props.imageIndex} {...props} />
+  <ImageView key={props.imageIndex} {...props} />
 );
 
 export default EnhancedImageViewing;

@@ -1,11 +1,20 @@
+/**
+ * Copyright (c) JOB TODAY S.A. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 import {
+  Animated,
   GestureResponderEvent,
-  NativeTouchEvent,
   PanResponder,
   PanResponderGestureState,
   PanResponderInstance,
-} from 'react-native';
-import type { DimensionsScreens, Position } from 'types/Image';
+  NativeTouchEvent,
+} from "react-native";
+import { Dimensions, Position } from "./@types";
 
 type CacheStorageItem = { key: string; value: any };
 
@@ -41,8 +50,8 @@ export const splitArrayIntoBatches = (arr: any[], batchSize: number): any[] =>
   }, []);
 
 export const getImageTransform = (
-  image: DimensionsScreens | null,
-  screen: DimensionsScreens
+  image: Dimensions | null,
+  screen: Dimensions
 ) => {
   if (!image?.width || !image?.height) {
     return [] as const;
@@ -57,21 +66,18 @@ export const getImageTransform = (
 };
 
 export const getImageStyles = (
-  image: DimensionsScreens | null,
-  translate: { x: number; y: number },
-  scale?: number
+  image: Dimensions | null,
+  translate: Animated.ValueXY,
+  scale?: Animated.Value
 ) => {
   if (!image?.width || !image?.height) {
     return { width: 0, height: 0 };
   }
 
-  const transform = [{ translateX: translate.x }, { translateY: translate.y }];
+  const transform = translate.getTranslateTransform();
 
   if (scale) {
-    const scaleTransform = { scale };
-    const perspectiveTransform = { perspective: 1000 };
-    transform.push(scaleTransform as any);
-    transform.push(perspectiveTransform as any);
+    transform.push({ scale }, { perspective: new Animated.Value(1000) });
   }
 
   return {
@@ -80,27 +86,28 @@ export const getImageStyles = (
     transform,
   };
 };
+
 export const getImageTranslate = (
-  image: DimensionsScreens,
-  screen: DimensionsScreens
+  image: Dimensions,
+  screen: Dimensions
 ): Position => {
-  const getTranslateForAxis = (axis: 'x' | 'y'): number => {
-    const imageSize = axis === 'x' ? image.width : image.height;
-    const screenSize = axis === 'x' ? screen.width : screen.height;
+  const getTranslateForAxis = (axis: "x" | "y"): number => {
+    const imageSize = axis === "x" ? image.width : image.height;
+    const screenSize = axis === "x" ? screen.width : screen.height;
 
     return (screenSize - imageSize) / 2;
   };
 
   return {
-    x: getTranslateForAxis('x'),
-    y: getTranslateForAxis('y'),
+    x: getTranslateForAxis("x"),
+    y: getTranslateForAxis("y"),
   };
 };
 
 export const getImageDimensionsByTranslate = (
   translate: Position,
-  screen: DimensionsScreens
-): DimensionsScreens => ({
+  screen: Dimensions
+): Dimensions => ({
   width: screen.width - translate.x * 2,
   height: screen.height - translate.y * 2,
 });
@@ -108,7 +115,7 @@ export const getImageDimensionsByTranslate = (
 export const getImageTranslateForScale = (
   currentTranslate: Position,
   targetScale: number,
-  screen: DimensionsScreens
+  screen: Dimensions
 ): Position => {
   const { width, height } = getImageDimensionsByTranslate(
     currentTranslate,

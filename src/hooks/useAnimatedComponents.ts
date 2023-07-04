@@ -1,8 +1,12 @@
-import {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+/**
+ * Copyright (c) JOB TODAY S.A. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+import { Animated } from "react-native";
 
 const INITIAL_POSITION = { x: 0, y: 0 };
 const ANIMATION_CONFIG = {
@@ -11,56 +15,33 @@ const ANIMATION_CONFIG = {
 };
 
 const useAnimatedComponents = () => {
-  const headerTranslateX = useSharedValue(INITIAL_POSITION.x);
-  const headerTranslateY = useSharedValue(INITIAL_POSITION.y);
-  const footerTranslateX = useSharedValue(INITIAL_POSITION.x);
-  const footerTranslateY = useSharedValue(INITIAL_POSITION.y);
-
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: withTiming(headerTranslateX.value, ANIMATION_CONFIG) },
-        { translateY: withTiming(headerTranslateY.value, ANIMATION_CONFIG) },
-      ],
-    };
-  });
-
-  const footerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: withTiming(footerTranslateX.value, ANIMATION_CONFIG) },
-        { translateY: withTiming(footerTranslateY.value, ANIMATION_CONFIG) },
-      ],
-    };
-  });
+  const headerTranslate = new Animated.ValueXY(INITIAL_POSITION);
+  const footerTranslate = new Animated.ValueXY(INITIAL_POSITION);
 
   const toggleVisible = (isVisible: boolean) => {
     if (isVisible) {
-      headerTranslateY.value = withTiming(0, ANIMATION_CONFIG);
-      footerTranslateY.value = withTiming(0, ANIMATION_CONFIG);
+      Animated.parallel([
+        Animated.timing(headerTranslate.y, { ...ANIMATION_CONFIG, toValue: 0 }),
+        Animated.timing(footerTranslate.y, { ...ANIMATION_CONFIG, toValue: 0 }),
+      ]).start();
     } else {
-      headerTranslateY.value = withTiming(-300, ANIMATION_CONFIG);
-      footerTranslateY.value = withTiming(300, ANIMATION_CONFIG);
+      Animated.parallel([
+        Animated.timing(headerTranslate.y, {
+          ...ANIMATION_CONFIG,
+          toValue: -300,
+        }),
+        Animated.timing(footerTranslate.y, {
+          ...ANIMATION_CONFIG,
+          toValue: 300,
+        }),
+      ]).start();
     }
   };
 
-  const getHeaderTransform = () => {
-    return headerAnimatedStyle.transform;
-  };
+  const headerTransform = headerTranslate.getTranslateTransform();
+  const footerTransform = footerTranslate.getTranslateTransform();
 
-  const getFooterTransform = () => {
-    return footerAnimatedStyle.transform;
-  };
-
-  const toggleVisibleWrapper = (isVisible: boolean) => {
-    toggleVisible(isVisible);
-  };
-
-  return [
-    getHeaderTransform,
-    getFooterTransform,
-    toggleVisibleWrapper,
-  ] as const;
+  return [headerTransform, footerTransform, toggleVisible] as const;
 };
 
 export default useAnimatedComponents;

@@ -1,20 +1,26 @@
-import { useEffect, useState } from 'react';
-import { Image, ImageURISource } from 'react-native';
+/**
+ * Copyright (c) JOB TODAY S.A. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
 
-import { createCache } from '@utils/index';
-import type { DimensionsScreens, ImageSource } from 'types/Image';
+import { useEffect, useState } from "react";
+import { Image, ImageURISource } from "react-native";
+
+import { createCache } from "../utils";
+import { Dimensions, ImageSource } from "../@types";
 
 const CACHE_SIZE = 50;
 const imageDimensionsCache = createCache(CACHE_SIZE);
 
-const useImageDimensions = (image: ImageSource): DimensionsScreens | null => {
-  const [dimensions, setDimensions] = useState<DimensionsScreens | null>(null);
+const useImageDimensions = (image: ImageSource): Dimensions | null => {
+  const [dimensions, setDimensions] = useState<Dimensions | null>(null);
 
-  const getImageDimensions = (
-    image: ImageSource
-  ): Promise<DimensionsScreens> => {
+  const getImageDimensions = (image: ImageSource): Promise<Dimensions> => {
     return new Promise((resolve) => {
-      if (typeof image === 'number') {
+      if (typeof image == "number") {
         const cacheKey = `${image}`;
         let imageDimensions = imageDimensionsCache.get(cacheKey);
 
@@ -29,6 +35,7 @@ const useImageDimensions = (image: ImageSource): DimensionsScreens | null => {
         return;
       }
 
+      // @ts-ignore
       if (image.uri) {
         const source = image as ImageURISource;
 
@@ -39,19 +46,18 @@ const useImageDimensions = (image: ImageSource): DimensionsScreens | null => {
         if (imageDimensions) {
           resolve(imageDimensions);
         } else {
-          if (source.uri && source.headers) {
-            Image.getSizeWithHeaders(
-              source.uri,
-              source.headers,
-              (width: number, height: number) => {
-                imageDimensionsCache.set(cacheKey, { width, height });
-                resolve({ width, height });
-              },
-              () => {
-                resolve({ width: 0, height: 0 });
-              }
-            );
-          }
+          // @ts-ignore
+          Image.getSizeWithHeaders(
+            source.uri,
+            source.headers,
+            (width: number, height: number) => {
+              imageDimensionsCache.set(cacheKey, { width, height });
+              resolve({ width, height });
+            },
+            () => {
+              resolve({ width: 0, height: 0 });
+            }
+          );
         }
       } else {
         resolve({ width: 0, height: 0 });
