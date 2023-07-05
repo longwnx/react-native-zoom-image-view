@@ -1,7 +1,11 @@
 import React, { useCallback } from 'react';
-import { NativeSyntheticEvent, NativeTouchEvent, ScrollView } from 'react-native';
+import type {
+  NativeSyntheticEvent,
+  NativeTouchEvent,
+  ScrollView,
+} from 'react-native';
 
-import { Dimensions } from '../@types';
+import type { Dimensions } from '@types';
 
 const DOUBLE_TAP_DELAY = 300;
 let lastTapTS: number | null = null;
@@ -13,9 +17,9 @@ let lastTapTS: number | null = null;
 function useDoubleTapToZoom(
   scrollViewRef: React.RefObject<ScrollView>,
   scaled: boolean,
-  screen: Dimensions,
+  screen: Dimensions
 ) {
-  const handleDoubleTap = useCallback(
+  return useCallback(
     (event: NativeSyntheticEvent<NativeTouchEvent>) => {
       const nowTS = new Date().getTime();
       const scrollResponderRef = scrollViewRef?.current?.getScrollResponder();
@@ -36,7 +40,6 @@ function useDoubleTapToZoom(
           targetHeight = screen.height / 2;
         }
 
-        // @ts-ignore
         scrollResponderRef?.scrollResponderZoomTo({
           x: targetX,
           y: targetY,
@@ -48,10 +51,8 @@ function useDoubleTapToZoom(
         lastTapTS = nowTS;
       }
     },
-    [scaled],
+    [scaled, screen.height, screen.width, scrollViewRef]
   );
-
-  return handleDoubleTap;
 }
 
 export default useDoubleTapToZoom;

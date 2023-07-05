@@ -76,6 +76,8 @@ function ImageView({
 
   const onZoom = useCallback(
     (isScaled: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
@@ -139,11 +141,7 @@ function ImageView({
           )}
           onMomentumScrollEnd={onScroll}
           keyExtractor={(imageSrc: ImageSource, index: number) =>
-            keyExtractor
-              ? keyExtractor(imageSrc, index)
-              : typeof imageSrc === 'number'
-              ? `${imageSrc}`
-              : imageSrc.uri
+            keyExtractor ? keyExtractor(imageSrc, index) : imageSrc.uri
           }
         />
         {typeof FooterComponent !== 'undefined' && (

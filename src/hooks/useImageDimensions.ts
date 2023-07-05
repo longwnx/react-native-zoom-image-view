@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Image, ImageURISource } from 'react-native';
 
 import { createCache } from '../utils';
-import { Dimensions, ImageSource } from '../@types';
+import type { Dimensions, ImageSource } from '@types';
 
 const CACHE_SIZE = 50;
 const imageDimensionsCache = createCache(CACHE_SIZE);
@@ -12,22 +12,6 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
 
   const getImageDimensions = (image: ImageSource): Promise<Dimensions> => {
     return new Promise((resolve) => {
-      if (typeof image == 'number') {
-        const cacheKey = `${image}`;
-        let imageDimensions = imageDimensionsCache.get(cacheKey);
-
-        if (!imageDimensions) {
-          const { width, height } = Image.resolveAssetSource(image);
-          imageDimensions = { width, height };
-          imageDimensionsCache.set(cacheKey, imageDimensions);
-        }
-
-        resolve(imageDimensions);
-
-        return;
-      }
-
-      // @ts-ignore
       if (image.uri) {
         const source = image as ImageURISource;
 
@@ -38,9 +22,10 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
         if (imageDimensions) {
           resolve(imageDimensions);
         } else {
-          // @ts-ignore
           Image.getSizeWithHeaders(
-            source.uri,
+            cacheKey,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             source.headers,
             (width: number, height: number) => {
               imageDimensionsCache.set(cacheKey, { width, height });
@@ -48,7 +33,7 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
             },
             () => {
               resolve({ width: 0, height: 0 });
-            },
+            }
           );
         }
       } else {
@@ -67,6 +52,7 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
     });
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       isImageUnmounted = true;
     };
   }, [image]);

@@ -71,6 +71,8 @@ export const getImageStyles = (
 
   if (scale) {
     transform.push({ scale } as any, {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       perspective: new Animated.Value(1000),
     });
   }
