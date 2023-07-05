@@ -66,7 +66,7 @@ const [visible, setIsVisible] = useState(false);
 />
 ```
 
-#### [See Example](https://github.com/jobtoday/react-native-zoom-image-view/blob/master/example/App.tsx#L62-L80)
+#### [See Example](https://github.com/longwnx/react-native-zoom-image-view/blob/master/example/App.tsx#L62-L80)
 
 ## Props
 
@@ -90,7 +90,7 @@ const [visible, setIsVisible] = useState(false);
 | `top`                    | Header safeArea Insets                                                                              | number                                                      | false    |
 | `loadingIndicatorColor`  | Loading indicator color                                                                             | string                                                      | false    |
 
-- type ImageSource = ImageURISource | ImageRequireSource
+- type ImageSource = {uri: string}
 
 ## Contributing
 
