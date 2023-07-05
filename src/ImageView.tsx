@@ -12,9 +12,9 @@ import {
 import ImageItem from './components/ImageItem/ImageItem';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 
-import useAnimatedComponents from './hooks/useAnimatedComponents';
-import useImageIndexChange from './hooks/useImageIndexChange';
-import useRequestClose from './hooks/useRequestClose';
+import useAnimatedComponents from '@hooks/useAnimatedComponents';
+import useImageIndexChange from '@hooks/useImageIndexChange';
+import useRequestClose from '@hooks/useRequestClose';
 import type { ImageSource } from '@types';
 
 type Props = {
@@ -31,6 +31,7 @@ type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   delayLongPress?: number;
+  loadingIndicatorColor?: string;
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
 };
@@ -57,6 +58,7 @@ function ImageView({
   delayLongPress = DEFAULT_DELAY_LONG_PRESS,
   HeaderComponent,
   FooterComponent,
+  loadingIndicatorColor = '#000000',
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
@@ -122,6 +124,7 @@ function ImageView({
           })}
           renderItem={({ item: imageSrc }) => (
             <ImageItem
+              loadingIndicatorColor={loadingIndicatorColor}
               onZoom={onZoom}
               imageSrc={imageSrc}
               onRequestClose={onRequestCloseEnhanced}

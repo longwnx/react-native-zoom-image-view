@@ -43,7 +43,8 @@ export const splitArrayIntoBatches = (arr: any[], batchSize: number): any[] =>
 
 export const getImageTransform = (
   image: Dimensions | null,
-  screen: Dimensions
+  screen: Dimensions,
+  top: number
 ) => {
   if (!image?.width || !image?.height) {
     return [] as const;
@@ -52,7 +53,7 @@ export const getImageTransform = (
   const wScale = screen.width / image.width;
   const hScale = screen.height / image.height;
   const scale = Math.min(wScale, hScale);
-  const { x, y } = getImageTranslate(image, screen);
+  const { x, y } = getImageTranslate(image, screen, top);
 
   return [{ x, y }, scale] as const;
 };
@@ -69,7 +70,9 @@ export const getImageStyles = (
   const transform = translate.getTranslateTransform();
 
   if (scale) {
-    transform.push({ scale }, { perspective: new Animated.Value(1000) });
+    transform.push({ scale } as any, {
+      perspective: new Animated.Value(1000),
+    });
   }
 
   return {
@@ -81,11 +84,12 @@ export const getImageStyles = (
 
 export const getImageTranslate = (
   image: Dimensions,
-  screen: Dimensions
+  screen: Dimensions,
+  top: number
 ): Position => {
   const getTranslateForAxis = (axis: 'x' | 'y'): number => {
     const imageSize = axis === 'x' ? image.width : image.height;
-    const screenSize = axis === 'x' ? screen.width : screen.height;
+    const screenSize = axis === 'x' ? screen.width : screen.height - (top || 0);
 
     return (screenSize - imageSize) / 2;
   };

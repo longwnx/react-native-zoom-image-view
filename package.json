@@ -169,6 +169,7 @@
   "dependencies": {
     "react-native-fast-image": "^8.6.3",
     "react-native-navigation": "7.33.1",
-    "react-native-reanimated": "^3.3.0"
+    "react-native-reanimated": "^3.3.0",
+    "react-native-safe-area-context": "^4.6.4"
   }
 }

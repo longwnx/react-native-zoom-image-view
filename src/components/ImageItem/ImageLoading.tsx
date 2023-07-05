@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 
@@ -6,9 +6,13 @@ const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 
-export const ImageLoading = () => (
+type Props = {
+  loadingIndicatorColor: string;
+};
+
+export const ImageLoading: FC<Props> = ({ loadingIndicatorColor }) => (
   <View style={styles.loading}>
-    <ActivityIndicator size="small" color="#FFF" />
+    <ActivityIndicator size="small" color={loadingIndicatorColor} />
   </View>
 );
 
