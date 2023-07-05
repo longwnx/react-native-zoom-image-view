@@ -1,9 +1,16 @@
 import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
-import { Animated, Dimensions, Modal, ModalProps, StyleSheet, View, VirtualizedList } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Modal,
+  ModalProps,
+  StyleSheet,
+  View,
+  VirtualizedList,
+} from 'react-native';
 
 import ImageItem from './components/ImageItem/ImageItem';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
-import StatusBarManager from './components/StatusBarManager';
 
 import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
@@ -24,8 +31,10 @@ type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   delayLongPress?: number;
+  loadingIndicatorColor?: string;
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
+  top?: number;
 };
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
@@ -35,23 +44,24 @@ const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
 
 function ImageView({
-                     images,
-                     keyExtractor,
-                     imageIndex,
-                     visible,
-                     onRequestClose,
-                     onLongPress = () => {
-                     },
-                     onImageIndexChange,
-                     animationType = DEFAULT_ANIMATION_TYPE,
-                     backgroundColor = DEFAULT_BG_COLOR,
-                     presentationStyle,
-                     swipeToCloseEnabled,
-                     doubleTapToZoomEnabled,
-                     delayLongPress = DEFAULT_DELAY_LONG_PRESS,
-                     HeaderComponent,
-                     FooterComponent,
-                   }: Props) {
+  images,
+  keyExtractor,
+  imageIndex,
+  visible,
+  onRequestClose,
+  onLongPress = () => undefined,
+  onImageIndexChange,
+  animationType = DEFAULT_ANIMATION_TYPE,
+  backgroundColor = DEFAULT_BG_COLOR,
+  presentationStyle,
+  swipeToCloseEnabled,
+  doubleTapToZoomEnabled,
+  delayLongPress = DEFAULT_DELAY_LONG_PRESS,
+  HeaderComponent,
+  FooterComponent,
+  loadingIndicatorColor = '#000000',
+  top = 0,
+}: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -62,15 +72,16 @@ function ImageView({
     if (onImageIndexChange) {
       onImageIndexChange(currentImageIndex);
     }
-  }, [currentImageIndex]);
+  }, [currentImageIndex, onImageIndexChange]);
 
   const onZoom = useCallback(
     (isScaled: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
-    [imageList],
+    [toggleBarsVisible]
   );
 
   if (!visible) {
@@ -87,7 +98,6 @@ function ImageView({
       supportedOrientations={['portrait']}
       hardwareAccelerated
     >
-      <StatusBarManager presentationStyle={presentationStyle} />
       <View style={[styles.container, { opacity, backgroundColor }]}>
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
           {typeof HeaderComponent !== 'undefined' ? (
@@ -116,8 +126,9 @@ function ImageView({
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }) => (
+          renderItem={({ item: imageSrc }: { item: ImageSource }) => (
             <ImageItem
+              loadingIndicatorColor={loadingIndicatorColor}
               onZoom={onZoom}
               imageSrc={imageSrc}
               onRequestClose={onRequestCloseEnhanced}
@@ -125,16 +136,12 @@ function ImageView({
               delayLongPress={delayLongPress}
               swipeToCloseEnabled={swipeToCloseEnabled}
               doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+              top={top}
             />
           )}
           onMomentumScrollEnd={onScroll}
-          //@ts-ignore
-          keyExtractor={(imageSrc, index) =>
-            keyExtractor
-              ? keyExtractor(imageSrc, index)
-              : typeof imageSrc === 'number'
-                ? `${imageSrc}`
-                : imageSrc.uri
+          keyExtractor={(imageSrc: ImageSource, index: number) =>
+            keyExtractor ? keyExtractor(imageSrc, index) : imageSrc.uri
           }
         />
         {typeof FooterComponent !== 'undefined' && (

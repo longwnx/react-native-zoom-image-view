@@ -21,6 +21,7 @@ module.exports = {
         allow: ['warn', 'error'],
       },
     ],
+    'no-multi-spaces': ['error'],
     'no-console': ['error', { allow: ['warn', 'error'] }],
   },
 };

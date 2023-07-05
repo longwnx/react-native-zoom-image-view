@@ -14,8 +14,9 @@ import useImageDimensions from '../../hooks/useImageDimensions';
 import usePanResponder from '../../hooks/usePanResponder';
 
 import { getImageStyles, getImageTransform } from '../../utils';
-import { ImageSource } from '../../@types';
+import type { ImageSource } from '@types';
 import { ImageLoading } from './ImageLoading';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -31,20 +32,23 @@ type Props = {
   delayLongPress: number;
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
+  loadingIndicatorColor: string;
 };
 
 const ImageItem = ({
-                     imageSrc,
-                     onZoom,
-                     onRequestClose,
-                     onLongPress,
-                     delayLongPress,
-                     swipeToCloseEnabled = true,
-                     doubleTapToZoomEnabled = true,
-                   }: Props) => {
+  imageSrc,
+  onZoom,
+  onRequestClose,
+  onLongPress,
+  delayLongPress,
+  swipeToCloseEnabled = true,
+  doubleTapToZoomEnabled = true,
+  loadingIndicatorColor,
+}: Props) => {
+  const { top } = useSafeAreaInsets();
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
   const imageDimensions = useImageDimensions(imageSrc);
-  const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
+  const [translate, scale] = getImageTransform(imageDimensions, SCREEN, top);
   const scrollValueY = new Animated.Value(0);
   const [isLoaded, setLoadEnd] = useState(false);
 
@@ -58,7 +62,7 @@ const ImageItem = ({
         });
       }
     },
-    [imageContainer],
+    [onZoom]
   );
 
   const onLongPressHandler = useCallback(() => {
@@ -77,7 +81,7 @@ const ImageItem = ({
   const imagesStyles = getImageStyles(
     imageDimensions,
     translateValue,
-    scaleValue,
+    scaleValue
   );
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
@@ -86,8 +90,8 @@ const ImageItem = ({
   const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
   const onScrollEndDrag = ({
-                             nativeEvent,
-                           }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const velocityY = nativeEvent?.velocity?.y ?? 0;
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
@@ -101,8 +105,8 @@ const ImageItem = ({
   };
 
   const onScroll = ({
-                      nativeEvent,
-                    }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
     scrollValueY.setValue(offsetY);
@@ -129,7 +133,9 @@ const ImageItem = ({
         style={imageStylesWithOpacity}
         onLoad={onLoaded}
       />
-      {(!isLoaded || !imageDimensions) && <ImageLoading />}
+      {(!isLoaded || !imageDimensions) && (
+        <ImageLoading loadingIndicatorColor={loadingIndicatorColor} />
+      )}
     </ScrollView>
   );
 };

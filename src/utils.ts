@@ -14,7 +14,7 @@ export const createCache = (cacheSize: number) => ({
   _storage: [] as CacheStorageItem[],
   get(key: string): any {
     const { value } =
-    this._storage.find(({ key: storageKey }) => storageKey === key) || {};
+      this._storage.find(({ key: storageKey }) => storageKey === key) || {};
 
     return value;
   },
@@ -44,6 +44,7 @@ export const splitArrayIntoBatches = (arr: any[], batchSize: number): any[] =>
 export const getImageTransform = (
   image: Dimensions | null,
   screen: Dimensions,
+  top: number
 ) => {
   if (!image?.width || !image?.height) {
     return [] as const;
@@ -52,7 +53,7 @@ export const getImageTransform = (
   const wScale = screen.width / image.width;
   const hScale = screen.height / image.height;
   const scale = Math.min(wScale, hScale);
-  const { x, y } = getImageTranslate(image, screen);
+  const { x, y } = getImageTranslate(image, screen, top);
 
   return [{ x, y }, scale] as const;
 };
@@ -60,7 +61,7 @@ export const getImageTransform = (
 export const getImageStyles = (
   image: Dimensions | null,
   translate: Animated.ValueXY,
-  scale?: Animated.Value,
+  scale?: Animated.Value
 ) => {
   if (!image?.width || !image?.height) {
     return { width: 0, height: 0 };
@@ -69,7 +70,11 @@ export const getImageStyles = (
   const transform = translate.getTranslateTransform();
 
   if (scale) {
-    transform.push({ scale }, { perspective: new Animated.Value(1000) });
+    transform.push({ scale } as any, {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      perspective: new Animated.Value(1000),
+    });
   }
 
   return {
@@ -82,10 +87,12 @@ export const getImageStyles = (
 export const getImageTranslate = (
   image: Dimensions,
   screen: Dimensions,
+  top: number
 ): Position => {
   const getTranslateForAxis = (axis: 'x' | 'y'): number => {
     const imageSize = axis === 'x' ? image.width : image.height;
-    const screenSize = axis === 'x' ? screen.width : screen.height;
+    const screenSize =
+      axis === 'x' ? screen.width : screen.height - (top + 50 || 50);
 
     return (screenSize - imageSize) / 2;
   };
@@ -98,7 +105,7 @@ export const getImageTranslate = (
 
 export const getImageDimensionsByTranslate = (
   translate: Position,
-  screen: Dimensions,
+  screen: Dimensions
 ): Dimensions => ({
   width: screen.width - translate.x * 2,
   height: screen.height - translate.y * 2,
@@ -108,10 +115,11 @@ export const getImageTranslateForScale = (
   currentTranslate: Position,
   targetScale: number,
   screen: Dimensions,
+  top: number
 ): Position => {
   const { width, height } = getImageDimensionsByTranslate(
     currentTranslate,
-    screen,
+    screen
   );
 
   const targetImageDimensions = {
@@ -119,12 +127,12 @@ export const getImageTranslateForScale = (
     height: height * targetScale,
   };
 
-  return getImageTranslate(targetImageDimensions, screen);
+  return getImageTranslate(targetImageDimensions, screen, top);
 };
 
 type HandlerType = (
   event: GestureResponderEvent,
-  state: PanResponderGestureState,
+  state: PanResponderGestureState
 ) => void;
 
 type PanResponderProps = {
@@ -136,12 +144,12 @@ type PanResponderProps = {
 };
 
 export const createPanResponder = ({
-                                     onGrant,
-                                     onStart,
-                                     onMove,
-                                     onRelease,
-                                     onTerminate,
-                                   }: PanResponderProps): PanResponderInstance =>
+  onGrant,
+  onStart,
+  onMove,
+  onRelease,
+  onTerminate,
+}: PanResponderProps): PanResponderInstance =>
   PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onStartShouldSetPanResponderCapture: () => true,
@@ -157,7 +165,7 @@ export const createPanResponder = ({
   });
 
 export const getDistanceBetweenTouches = (
-  touches: NativeTouchEvent[],
+  touches: NativeTouchEvent[]
 ): number => {
   const [a, b] = touches;
 
@@ -166,6 +174,6 @@ export const getDistanceBetweenTouches = (
   }
 
   return Math.sqrt(
-    Math.pow(a.pageX - b.pageX, 2) + Math.pow(a.pageY - b.pageY, 2),
+    Math.pow(a.pageX - b.pageX, 2) + Math.pow(a.pageY - b.pageY, 2)
   );
 };
