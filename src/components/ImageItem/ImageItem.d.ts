@@ -10,6 +10,7 @@ declare type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   loadingIndicatorColor: string;
+  top: number;
 };
 
 declare const _default: React.MemoExoticComponent<
@@ -21,6 +22,7 @@ declare const _default: React.MemoExoticComponent<
     delayLongPress,
     swipeToCloseEnabled,
     loadingIndicatorColor,
+    top,
   }: Props) => JSX.Element
 >;
 

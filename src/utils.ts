@@ -89,7 +89,8 @@ export const getImageTranslate = (
 ): Position => {
   const getTranslateForAxis = (axis: 'x' | 'y'): number => {
     const imageSize = axis === 'x' ? image.width : image.height;
-    const screenSize = axis === 'x' ? screen.width : screen.height - (top || 0);
+    const screenSize =
+      axis === 'x' ? screen.width : screen.height - (top + 50 || 50);
 
     return (screenSize - imageSize) / 2;
   };
@@ -111,7 +112,8 @@ export const getImageDimensionsByTranslate = (
 export const getImageTranslateForScale = (
   currentTranslate: Position,
   targetScale: number,
-  screen: Dimensions
+  screen: Dimensions,
+  top: number
 ): Position => {
   const { width, height } = getImageDimensionsByTranslate(
     currentTranslate,
@@ -123,7 +125,7 @@ export const getImageTranslateForScale = (
     height: height * targetScale,
   };
 
-  return getImageTranslate(targetImageDimensions, screen);
+  return getImageTranslate(targetImageDimensions, screen, top);
 };
 
 type HandlerType = (

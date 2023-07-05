@@ -12,9 +12,9 @@ import {
 import ImageItem from './components/ImageItem/ImageItem';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 
-import useAnimatedComponents from '@hooks/useAnimatedComponents';
-import useImageIndexChange from '@hooks/useImageIndexChange';
-import useRequestClose from '@hooks/useRequestClose';
+import useAnimatedComponents from './hooks/useAnimatedComponents';
+import useImageIndexChange from './hooks/useImageIndexChange';
+import useRequestClose from './hooks/useRequestClose';
 import type { ImageSource } from '@types';
 
 type Props = {
@@ -34,6 +34,7 @@ type Props = {
   loadingIndicatorColor?: string;
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
+  top?: number;
 };
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
@@ -59,6 +60,7 @@ function ImageView({
   HeaderComponent,
   FooterComponent,
   loadingIndicatorColor = '#000000',
+  top = 0,
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
@@ -122,7 +124,7 @@ function ImageView({
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }) => (
+          renderItem={({ item: imageSrc }: { item: ImageSource }) => (
             <ImageItem
               loadingIndicatorColor={loadingIndicatorColor}
               onZoom={onZoom}
@@ -132,10 +134,11 @@ function ImageView({
               delayLongPress={delayLongPress}
               swipeToCloseEnabled={swipeToCloseEnabled}
               doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+              top={top}
             />
           )}
           onMomentumScrollEnd={onScroll}
-          keyExtractor={(imageSrc, index) =>
+          keyExtractor={(imageSrc: ImageSource, index: number) =>
             keyExtractor
               ? keyExtractor(imageSrc, index)
               : typeof imageSrc === 'number'

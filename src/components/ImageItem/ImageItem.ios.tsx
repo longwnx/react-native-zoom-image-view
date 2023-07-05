@@ -19,7 +19,6 @@ import { getImageStyles, getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
 import { ImageLoading } from './ImageLoading';
 import FastImage, { FastImageProps } from 'react-native-fast-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.55;
@@ -36,6 +35,7 @@ type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   loadingIndicatorColor: string;
+  top: number;
 };
 
 const ImageItem = ({
@@ -47,8 +47,8 @@ const ImageItem = ({
   swipeToCloseEnabled = true,
   doubleTapToZoomEnabled = true,
   loadingIndicatorColor,
+  top,
 }: Props) => {
-  const { top } = useSafeAreaInsets();
   const { width } = Dimensions.get('screen');
   const AnimatedFastImage = Animated.createAnimatedComponent(
     FastImage as React.ComponentClass<FastImageProps>
@@ -58,7 +58,6 @@ const ImageItem = ({
   const [scaled, setScaled] = useState(false);
   const imageDimensions = useImageDimensions(imageSrc);
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
-
   const [translate, scale] = getImageTransform(imageDimensions, SCREEN, top);
   // const scrollValueY = new Animated.Value(0);
   const scaleValue = new Animated.Value(scale || 1);
