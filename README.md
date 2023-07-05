@@ -1,8 +1,8 @@
-# react-native-image-viewing
+# react-native-zoom-image-view
 
 > React Native modal component for viewing images as a sliding gallery.
 
-[![npm version](https://badge.fury.io/js/react-native-image-viewing.svg)](https://badge.fury.io/js/react-native-image-viewing)
+[![npm version](https://badge.fury.io/js/react-native-zoom-image-view.svg)](https://badge.fury.io/js/react-native-zoom-image-view)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 - 🔥Pinch zoom for both iOS and Android
@@ -11,38 +11,41 @@
 - 🔥Custom header and footer components
 - 🔥Uses VirtualizedList to optimize image loading and rendering
 
-Try with Expo: https://expo.io/@antonkalinin/react-native-image-viewing
+[//]: # (Try with Expo: https://expo.io/@antonkalinin/react-native-zoom-image-view)
 
 <p align="center">
-  <img src="https://github.com/jobtoday/react-native-image-viewing/blob/master/demo.gif?raw=true" height="480" />
+  <img src="https://github.com/longwnx/react-native-zoom-image-view/blob/main/demo.gif?raw=true" height="480" />
 </p>
 
 ## Installation
 
 ```bash
-yarn add react-native-image-viewing
+yarn add react-native-zoom-image-view
 ```
 
 or
 
 ```bash
-npm install --save react-native-image-viewing
+npm install --save react-native-zoom-image-view
 ```
 
 ## Usage
 
 ```jsx
-import ImageView from "react-native-image-viewing";
+import ImageView from "react-native-zoom-image-view";
 
 const images = [
   {
-    uri: "https://images.unsplash.com/photo-1571501679680-de32f1e7aad4",
+    uri: "https://cdn11.bigcommerce.com/s-jl99edfb3g/images/stencil/original/attribute_rule_images/2797_source_1685935851.jpg",
   },
   {
-    uri: "https://images.unsplash.com/photo-1573273787173-0eb81a833b34",
+    uri: "https://cdn11.bigcommerce.com/s-jl99edfb3g/images/stencil/original/attribute_rule_images/2798_source_1685935851.jp",
   },
   {
-    uri: "https://images.unsplash.com/photo-1569569970363-df7b6160d111",
+    uri: "https://cdn11.bigcommerce.com/s-jl99edfb3g/images/stencil/original/attribute_rule_images/2799_source_1685935851.jpg",
+  },
+  {
+    uri: "https://cdn11.bigcommerce.com/s-jl99edfb3g/images/stencil/original/attribute_rule_images/2800_source_1685935851.jpg",
   },
 ];
 
@@ -52,11 +55,18 @@ const [visible, setIsVisible] = useState(false);
   images={images}
   imageIndex={0}
   visible={visible}
-  onRequestClose={() => setIsVisible(false)}
+  swipeToCloseEnabled={true}
+  onRequestClose={closeModal}
+  doubleTapToZoomEnabled={true}
+  onImageIndexChange={setActiveIndex}
+  backgroundColor={'white'}
+  animationType={'slide'}
+  loadingIndicatorColor={'#000000'}
+  top={top}
 />
 ```
 
-#### [See Example](https://github.com/jobtoday/react-native-image-viewing/blob/master/example/App.tsx#L62-L80)
+#### [See Example](https://github.com/jobtoday/react-native-zoom-image-view/blob/master/example/App.tsx#L62-L80)
 
 ## Props
 
@@ -77,12 +87,14 @@ const [visible, setIsVisible] = useState(false);
 | `doubleTapToZoomEnabled` | Zoom image by double tap on it: default `true`                                                      | boolean                                                     | false    |
 | `HeaderComponent`        | Header component, gets current `imageIndex` as a prop                                               | component, function                                         | false    |
 | `FooterComponent`        | Footer component, gets current `imageIndex` as a prop                                               | component, function                                         | false    |
+| `top`                    | Header safeArea Insets                                                                              | number                                                      | false    |
+| `loadingIndicatorColor`  | Loading indicator color                                                                             | string                                                      | false    |
 
 - type ImageSource = ImageURISource | ImageRequireSource
 
 ## Contributing
 
-To start contributing clone this repo and then run inside `react-native-image-viewing` folder:
+To start contributing clone this repo and then run inside `react-native-zoom-image-view` folder:
 
 ```bash
 yarn
