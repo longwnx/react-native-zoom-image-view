@@ -36,14 +36,14 @@ type Props = {
 };
 
 const ImageItem = ({
-                     imageSrc,
-                     onZoom,
-                     onRequestClose,
-                     onLongPress,
-                     delayLongPress,
-                     swipeToCloseEnabled = true,
-                     doubleTapToZoomEnabled = true,
-                   }: Props) => {
+  imageSrc,
+  onZoom,
+  onRequestClose,
+  onLongPress,
+  delayLongPress,
+  swipeToCloseEnabled = true,
+  doubleTapToZoomEnabled = true,
+}: Props) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [loaded, setLoaded] = useState(false);
   const [scaled, setScaled] = useState(false);
@@ -63,7 +63,7 @@ const ImageItem = ({
   const imagesStyles = getImageStyles(
     imageDimensions,
     translateValue,
-    scaleValue,
+    scaleValue
   );
   const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
@@ -75,7 +75,8 @@ const ImageItem = ({
       onZoom(scaled);
       setScaled(scaled);
 
-      if (swipeToCloseEnabled &&
+      if (
+        swipeToCloseEnabled &&
         !scaled &&
         swipeToCloseEnabled &&
         Math.abs(velocityY) > SWIPE_CLOSE_VELOCITY
@@ -83,26 +84,22 @@ const ImageItem = ({
         onRequestClose();
       }
     },
-    [scaled],
+    [onRequestClose, onZoom, swipeToCloseEnabled]
   );
 
   const onScroll = ({
-                      nativeEvent,
-                    }: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // const offsetY = nativeEvent?.contentOffset?.y ?? 0;
-
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
     if (nativeEvent?.zoomScale > 1) {
       return;
     }
-
-    // scrollValueY.setValue(offsetY);
   };
 
   const onLongPressHandler = useCallback(
     (_event: GestureResponderEvent) => {
       onLongPress(imageSrc);
     },
-    [imageSrc, onLongPress],
+    [imageSrc, onLongPress]
   );
 
   return (

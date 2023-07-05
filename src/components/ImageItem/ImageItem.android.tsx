@@ -14,7 +14,7 @@ import useImageDimensions from '../../hooks/useImageDimensions';
 import usePanResponder from '../../hooks/usePanResponder';
 
 import { getImageStyles, getImageTransform } from '../../utils';
-import { ImageSource } from '../../@types';
+import type { ImageSource } from '@types';
 import { ImageLoading } from './ImageLoading';
 
 const SWIPE_CLOSE_OFFSET = 75;
@@ -34,14 +34,14 @@ type Props = {
 };
 
 const ImageItem = ({
-                     imageSrc,
-                     onZoom,
-                     onRequestClose,
-                     onLongPress,
-                     delayLongPress,
-                     swipeToCloseEnabled = true,
-                     doubleTapToZoomEnabled = true,
-                   }: Props) => {
+  imageSrc,
+  onZoom,
+  onRequestClose,
+  onLongPress,
+  delayLongPress,
+  swipeToCloseEnabled = true,
+  doubleTapToZoomEnabled = true,
+}: Props) => {
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
   const imageDimensions = useImageDimensions(imageSrc);
   const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
@@ -58,7 +58,7 @@ const ImageItem = ({
         });
       }
     },
-    [imageContainer],
+    [onZoom]
   );
 
   const onLongPressHandler = useCallback(() => {
@@ -77,7 +77,7 @@ const ImageItem = ({
   const imagesStyles = getImageStyles(
     imageDimensions,
     translateValue,
-    scaleValue,
+    scaleValue
   );
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
@@ -86,8 +86,8 @@ const ImageItem = ({
   const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
   const onScrollEndDrag = ({
-                             nativeEvent,
-                           }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const velocityY = nativeEvent?.velocity?.y ?? 0;
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
@@ -101,8 +101,8 @@ const ImageItem = ({
   };
 
   const onScroll = ({
-                      nativeEvent,
-                    }: NativeSyntheticEvent<NativeScrollEvent>) => {
+    nativeEvent,
+  }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
 
     scrollValueY.setValue(offsetY);
