@@ -116,7 +116,11 @@ const ImageView: FC<Props> = ({
               imageIndex: currentImageIndex,
             })
           ) : (
-            <ImageDefaultHeader onRequestClose={onRequestCloseEnhanced} />
+            <ImageDefaultHeader
+              images={images}
+              activeIndex={currentImageIndex}
+              onRequestClose={onRequestCloseEnhanced}
+            />
           )}
         </Animated.View>
         <VirtualizedList

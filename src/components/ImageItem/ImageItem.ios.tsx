@@ -123,7 +123,6 @@ const ImageItem = ({
           onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
           onLongPress={onLongPressHandler}
           delayLongPress={delayLongPress}
-          style={{ backgroundColor: 'red', zIndex: 10000 }}
         >
           <AnimatedFastImage
             resizeMode={resizeMode}
