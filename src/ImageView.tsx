@@ -1,6 +1,11 @@
-import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
+import React, {
+  ComponentType,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import {
-  Animated,
   Dimensions,
   Modal,
   ModalProps,
@@ -8,6 +13,7 @@ import {
   View,
   VirtualizedList,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import ImageItem from './components/ImageItem/ImageItem';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
@@ -16,8 +22,9 @@ import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
 import useRequestClose from './hooks/useRequestClose';
 import type { ImageSource } from '@types';
+import { Priority, ResizeMode } from 'react-native-fast-image';
 
-type Props = {
+interface Props {
   images: ImageSource[];
   keyExtractor?: (imageSrc: ImageSource, index: number) => string;
   imageIndex: number;
@@ -35,7 +42,9 @@ type Props = {
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
   top?: number;
-};
+  cachePriority?: Priority;
+  resizeMode: ResizeMode;
+}
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
 const DEFAULT_BG_COLOR = '#000';
@@ -43,7 +52,7 @@ const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
 
-function ImageView({
+const ImageView: FC<Props> = ({
   images,
   keyExtractor,
   imageIndex,
@@ -60,13 +69,14 @@ function ImageView({
   HeaderComponent,
   FooterComponent,
   loadingIndicatorColor = '#000000',
+  cachePriority = 'high',
+  resizeMode = 'contain',
   top = 0,
-}: Props) {
+}) => {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
-  const [headerTransform, footerTransform, toggleBarsVisible] =
-    useAnimatedComponents();
+  const { headerStyle, footerStyle, toggleVisible } = useAnimatedComponents();
 
   useEffect(() => {
     if (onImageIndexChange) {
@@ -79,9 +89,9 @@ function ImageView({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
-      toggleBarsVisible(!isScaled);
+      toggleVisible(!isScaled);
     },
-    [toggleBarsVisible]
+    [toggleVisible]
   );
 
   if (!visible) {
@@ -99,13 +109,17 @@ function ImageView({
       hardwareAccelerated
     >
       <View style={[styles.container, { opacity, backgroundColor }]}>
-        <Animated.View style={[styles.header, { transform: headerTransform }]}>
+        <Animated.View style={[styles.header, headerStyle]}>
           {typeof HeaderComponent !== 'undefined' ? (
             React.createElement(HeaderComponent, {
               imageIndex: currentImageIndex,
             })
           ) : (
-            <ImageDefaultHeader onRequestClose={onRequestCloseEnhanced} />
+            <ImageDefaultHeader
+              images={images}
+              activeIndex={currentImageIndex}
+              onRequestClose={onRequestCloseEnhanced}
+            />
           )}
         </Animated.View>
         <VirtualizedList
@@ -137,6 +151,8 @@ function ImageView({
               swipeToCloseEnabled={swipeToCloseEnabled}
               doubleTapToZoomEnabled={doubleTapToZoomEnabled}
               top={top}
+              cachePriority={cachePriority}
+              resizeMode={resizeMode}
             />
           )}
           onMomentumScrollEnd={onScroll}
@@ -145,9 +161,7 @@ function ImageView({
           }
         />
         {typeof FooterComponent !== 'undefined' && (
-          <Animated.View
-            style={[styles.footer, { transform: footerTransform }]}
-          >
+          <Animated.View style={[styles.footer, footerStyle]}>
             {React.createElement(FooterComponent, {
               imageIndex: currentImageIndex,
             })}
@@ -156,7 +170,7 @@ function ImageView({
       </View>
     </Modal>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

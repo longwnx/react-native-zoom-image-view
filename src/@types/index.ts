@@ -1,4 +1,4 @@
-export type Dimensions = {
+export type DimensionsType = {
   width: number;
   height: number;
 };

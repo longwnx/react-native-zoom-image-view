@@ -1,44 +1,70 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import React, { FC } from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import FastImage from 'react-native-fast-image';
+import type { ImageSource } from '@types';
 
-type Props = {
+interface Props {
   onRequestClose: () => void;
-};
+  activeIndex: number;
+  images: ImageSource[];
+}
 
-const HIT_SLOP = { top: 16, left: 16, bottom: 16, right: 16 };
+const ImageDefaultHeader: FC<Props> = ({
+  onRequestClose,
+  activeIndex,
+  images,
+}) => (
+  <>
+    <SafeAreaView />
+    <View style={styles.root}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={styles.closeButton}
+        onPress={onRequestClose}
+      >
+        <FastImage
+          source={require('assets/icons/ic_XBack.png')}
+          style={{ width: 18, height: 18 }}
+        />
+      </TouchableOpacity>
 
-const ImageDefaultHeader = ({ onRequestClose }: Props) => (
-  <SafeAreaView style={styles.root}>
-    <TouchableOpacity
-      style={styles.closeButton}
-      onPress={onRequestClose}
-      hitSlop={HIT_SLOP}
-    >
-      <Text style={styles.closeText}>✕</Text>
-    </TouchableOpacity>
-  </SafeAreaView>
+      <Text style={styles.closeText}>
+        {`${activeIndex + 1} of ${images.length}`}
+      </Text>
+    </View>
+  </>
 );
 
 const styles = StyleSheet.create({
   root: {
-    alignItems: 'flex-end',
+    width: '100%',
+    height: 30,
+    justifyContent: 'center',
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    top: 10,
+    left: 0,
+    right: 0,
   },
   closeButton: {
-    marginRight: 8,
-    marginTop: 8,
-    width: 44,
-    height: 44,
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    width: 30,
+    height: 30,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: '#00000077',
   },
   closeText: {
-    lineHeight: 22,
-    fontSize: 19,
-    textAlign: 'center',
-    color: '#FFF',
-    includeFontPadding: false,
+    fontSize: 16,
+    color: '#000000',
   },
 });
 

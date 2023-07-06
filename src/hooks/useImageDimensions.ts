@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { Image, ImageURISource } from 'react-native';
 
 import { createCache } from '../utils';
-import type { Dimensions, ImageSource } from '@types';
+import type { DimensionsType, ImageSource } from '@types';
 
 const CACHE_SIZE = 50;
 const imageDimensionsCache = createCache(CACHE_SIZE);
 
-const useImageDimensions = (image: ImageSource): Dimensions | null => {
-  const [dimensions, setDimensions] = useState<Dimensions | null>(null);
+const useImageDimensions = (image: ImageSource): DimensionsType | null => {
+  const [dimensions, setDimensions] = useState<DimensionsType | null>(null);
 
-  const getImageDimensions = (image: ImageSource): Promise<Dimensions> => {
+  const getImageDimensions = (image: ImageSource): Promise<DimensionsType> => {
     return new Promise((resolve) => {
       if (image.uri) {
         const source = image as ImageURISource;

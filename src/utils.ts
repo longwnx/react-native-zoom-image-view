@@ -6,7 +6,7 @@ import {
   PanResponderGestureState,
   PanResponderInstance,
 } from 'react-native';
-import type { Dimensions, Position } from '@types';
+import type { DimensionsType, Position } from '@types';
 
 type CacheStorageItem = { key: string; value: any };
 
@@ -42,8 +42,8 @@ export const splitArrayIntoBatches = (arr: any[], batchSize: number): any[] =>
   }, []);
 
 export const getImageTransform = (
-  image: Dimensions | null,
-  screen: Dimensions,
+  image: DimensionsType | null,
+  screen: DimensionsType,
   top: number
 ) => {
   if (!image?.width || !image?.height) {
@@ -59,7 +59,7 @@ export const getImageTransform = (
 };
 
 export const getImageStyles = (
-  image: Dimensions | null,
+  image: DimensionsType | null,
   translate: Animated.ValueXY,
   scale?: Animated.Value
 ) => {
@@ -85,8 +85,8 @@ export const getImageStyles = (
 };
 
 export const getImageTranslate = (
-  image: Dimensions,
-  screen: Dimensions,
+  image: DimensionsType,
+  screen: DimensionsType,
   top: number
 ): Position => {
   const getTranslateForAxis = (axis: 'x' | 'y'): number => {
@@ -105,8 +105,8 @@ export const getImageTranslate = (
 
 export const getImageDimensionsByTranslate = (
   translate: Position,
-  screen: Dimensions
-): Dimensions => ({
+  screen: DimensionsType
+): DimensionsType => ({
   width: screen.width - translate.x * 2,
   height: screen.height - translate.y * 2,
 });
@@ -114,7 +114,7 @@ export const getImageDimensionsByTranslate = (
 export const getImageTranslateForScale = (
   currentTranslate: Position,
   targetScale: number,
-  screen: Dimensions,
+  screen: DimensionsType,
   top: number
 ): Position => {
   const { width, height } = getImageDimensionsByTranslate(

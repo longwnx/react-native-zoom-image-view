@@ -133,7 +133,7 @@ const ImageItem = ({
         style={imageStylesWithOpacity}
         onLoad={onLoaded}
       />
-      {(!isLoaded || !imageDimensions) && (
+      {!isLoaded && (
         <ImageLoading loadingIndicatorColor={loadingIndicatorColor} />
       )}
     </ScrollView>
