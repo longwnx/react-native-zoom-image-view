@@ -43,7 +43,7 @@ interface Props {
   FooterComponent?: ComponentType<{ imageIndex: number }>;
   top?: number;
   cachePriority?: Priority;
-  resizeMode: ResizeMode;
+  resizeMode?: ResizeMode;
 }
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
