@@ -1,4 +1,10 @@
-import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
+import React, {
+  ComponentType,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   Animated,
   Dimensions,
@@ -16,8 +22,9 @@ import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
 import useRequestClose from './hooks/useRequestClose';
 import type { ImageSource } from '@types';
+import { Priority, ResizeMode } from 'react-native-fast-image';
 
-type Props = {
+interface Props {
   images: ImageSource[];
   keyExtractor?: (imageSrc: ImageSource, index: number) => string;
   imageIndex: number;
@@ -35,7 +42,9 @@ type Props = {
   HeaderComponent?: ComponentType<{ imageIndex: number }>;
   FooterComponent?: ComponentType<{ imageIndex: number }>;
   top?: number;
-};
+  cachePriority?: Priority;
+  resizeMode: ResizeMode;
+}
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
 const DEFAULT_BG_COLOR = '#000';
@@ -43,7 +52,7 @@ const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
 
-function ImageView({
+const ImageView: FC<Props> = ({
   images,
   keyExtractor,
   imageIndex,
@@ -60,8 +69,10 @@ function ImageView({
   HeaderComponent,
   FooterComponent,
   loadingIndicatorColor = '#000000',
+  cachePriority = 'high',
+  resizeMode = 'contain',
   top = 0,
-}: Props) {
+}) => {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -137,6 +148,8 @@ function ImageView({
               swipeToCloseEnabled={swipeToCloseEnabled}
               doubleTapToZoomEnabled={doubleTapToZoomEnabled}
               top={top}
+              cachePriority={cachePriority}
+              resizeMode={resizeMode}
             />
           )}
           onMomentumScrollEnd={onScroll}
@@ -156,7 +169,7 @@ function ImageView({
       </View>
     </Modal>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {

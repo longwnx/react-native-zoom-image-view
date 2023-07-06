@@ -1,5 +1,6 @@
 import React from 'react';
 import { ImageSource } from '@types';
+import { Priority, ResizeMode } from 'react-native-fast-image';
 
 declare type Props = {
   imageSrc: ImageSource;
@@ -10,7 +11,9 @@ declare type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   loadingIndicatorColor: string;
+  cachePriority: Priority;
   top: number;
+  resizeMode: ResizeMode;
 };
 
 declare const _default: React.MemoExoticComponent<
@@ -23,6 +26,8 @@ declare const _default: React.MemoExoticComponent<
     swipeToCloseEnabled,
     loadingIndicatorColor,
     top,
+    resizeMode,
+    cachePriority,
   }: Props) => JSX.Element
 >;
 
