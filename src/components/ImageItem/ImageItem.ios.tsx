@@ -57,6 +57,7 @@ const ImageItem = ({
   );
   const scrollViewRef = useRef<ScrollView>(null);
   const [scaled, setScaled] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [dimensions, setDimensions] = useState<DimensionsType | null>(null);
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
@@ -65,7 +66,6 @@ const ImageItem = ({
   const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
 
   const imagesStyles = getImageStyles(dimensions, translateValue, scaleValue);
-  const imageStyles = { ...imagesStyles };
 
   const onScrollEndDrag = useCallback(
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -123,21 +123,27 @@ const ImageItem = ({
           onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
           onLongPress={onLongPressHandler}
           delayLongPress={delayLongPress}
+          style={{ backgroundColor: 'red', zIndex: 10000 }}
         >
           <AnimatedFastImage
             resizeMode={resizeMode}
             source={{ uri: imageSrc?.uri || '', priority: cachePriority }}
             style={[
               { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 },
-              imageStyles,
+              { ...imagesStyles },
             ]}
-            defaultSource={require('assets/image.png')}
-            onLoad={(event) => {
-              setDimensions({
-                width: event?.nativeEvent?.width,
-                height: event?.nativeEvent?.height,
-              });
-            }}
+            defaultSource={require('../../../assets/image.png')}
+            onLoad={
+              !loaded
+                ? (event) => {
+                    setDimensions({
+                      width: event?.nativeEvent?.width,
+                      height: event?.nativeEvent?.height,
+                    });
+                    setLoaded(true);
+                  }
+                : undefined
+            }
           />
         </TouchableWithoutFeedback>
       </ScrollView>
