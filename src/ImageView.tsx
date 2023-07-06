@@ -6,7 +6,6 @@ import React, {
   useRef,
 } from 'react';
 import {
-  Animated,
   Dimensions,
   Modal,
   ModalProps,
@@ -14,6 +13,7 @@ import {
   View,
   VirtualizedList,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import ImageItem from './components/ImageItem/ImageItem';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
@@ -76,8 +76,7 @@ const ImageView: FC<Props> = ({
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
   const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
-  const [headerTransform, footerTransform, toggleBarsVisible] =
-    useAnimatedComponents();
+  const { headerStyle, footerStyle, toggleVisible } = useAnimatedComponents();
 
   useEffect(() => {
     if (onImageIndexChange) {
@@ -90,9 +89,9 @@ const ImageView: FC<Props> = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
-      toggleBarsVisible(!isScaled);
+      toggleVisible(!isScaled);
     },
-    [toggleBarsVisible]
+    [toggleVisible]
   );
 
   if (!visible) {
@@ -110,7 +109,7 @@ const ImageView: FC<Props> = ({
       hardwareAccelerated
     >
       <View style={[styles.container, { opacity, backgroundColor }]}>
-        <Animated.View style={[styles.header, { transform: headerTransform }]}>
+        <Animated.View style={[styles.header, headerStyle]}>
           {typeof HeaderComponent !== 'undefined' ? (
             React.createElement(HeaderComponent, {
               imageIndex: currentImageIndex,
@@ -162,9 +161,7 @@ const ImageView: FC<Props> = ({
           }
         />
         {typeof FooterComponent !== 'undefined' && (
-          <Animated.View
-            style={[styles.footer, { transform: footerTransform }]}
-          >
+          <Animated.View style={[styles.footer, footerStyle]}>
             {React.createElement(FooterComponent, {
               imageIndex: currentImageIndex,
             })}
