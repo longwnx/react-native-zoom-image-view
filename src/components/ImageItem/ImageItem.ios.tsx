@@ -14,7 +14,8 @@ import {
 
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
 import { getImageStyles, getImageTransform } from '../../utils';
-import type { DimensionsType, ImageSource } from '@types';
+import type { ImageSource } from '@types';
+import { DimensionsType } from '@types';
 import FastImage, {
   FastImageProps,
   Priority,
@@ -55,10 +56,13 @@ const ImageItem = ({
   const AnimatedFastImage = Animated.createAnimatedComponent(
     FastImage as React.ComponentClass<FastImageProps>
   );
+  const [loaded, setLoaded] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [scaled, setScaled] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [dimensions, setDimensions] = useState<DimensionsType | null>(null);
+  const [dimensions, setDimensions] = useState<DimensionsType | null>({
+    width: SCREEN_WIDTH,
+    height: (SCREEN_WIDTH * 16) / 9,
+  });
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
   const scaleValue = new Animated.Value(scale || 1);
@@ -128,10 +132,13 @@ const ImageItem = ({
             resizeMode={resizeMode}
             source={{ uri: imageSrc?.uri || '', priority: cachePriority }}
             style={[
-              { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 },
+              {
+                width: SCREEN_WIDTH,
+                height: (SCREEN_WIDTH * 16) / 9,
+                backgroundColor: 'red',
+              },
               { ...imagesStyles },
             ]}
-            defaultSource={require('../../../assets/image.png')}
             onLoad={
               !loaded
                 ? (event) => {
@@ -143,6 +150,7 @@ const ImageItem = ({
                   }
                 : undefined
             }
+            defaultSource={require('../../../assets/image.png')}
           />
         </TouchableWithoutFeedback>
       </ScrollView>

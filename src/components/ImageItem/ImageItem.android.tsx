@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { FC, useCallback, useRef } from 'react';
 
 import {
   Animated,
@@ -9,14 +9,15 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
-
-import useImageDimensions from '../../hooks/useImageDimensions';
 import usePanResponder from '../../hooks/usePanResponder';
 
 import { getImageStyles, getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
-import { ImageLoading } from './ImageLoading';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FastImage, {
+  FastImageProps,
+  Priority,
+  ResizeMode,
+} from 'react-native-fast-image';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -24,7 +25,7 @@ const SCREEN = Dimensions.get('window');
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 
-type Props = {
+interface Props {
   imageSrc: ImageSource;
   onRequestClose: () => void;
   onZoom: (isZoomed: boolean) => void;
@@ -33,9 +34,12 @@ type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   loadingIndicatorColor: string;
-};
+  top: number;
+  cachePriority: Priority;
+  resizeMode: ResizeMode;
+}
 
-const ImageItem = ({
+const ImageItem: FC<Props> = ({
   imageSrc,
   onZoom,
   onRequestClose,
@@ -43,16 +47,18 @@ const ImageItem = ({
   delayLongPress,
   swipeToCloseEnabled = true,
   doubleTapToZoomEnabled = true,
-  loadingIndicatorColor,
-}: Props) => {
-  const { top } = useSafeAreaInsets();
+  cachePriority,
+  resizeMode,
+  top,
+}) => {
+  const AnimatedFastImage = Animated.createAnimatedComponent(
+    FastImage as React.ComponentClass<FastImageProps>
+  );
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
-  const imageDimensions = useImageDimensions(imageSrc);
-  const [translate, scale] = getImageTransform(imageDimensions, SCREEN, top);
+  const dimensions = { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
+  const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
   const scrollValueY = new Animated.Value(0);
-  const [isLoaded, setLoadEnd] = useState(false);
 
-  const onLoaded = useCallback(() => setLoadEnd(true), []);
   const onZoomPerformed = useCallback(
     (isZoomed: boolean) => {
       onZoom(isZoomed);
@@ -78,11 +84,7 @@ const ImageItem = ({
     delayLongPress,
   });
 
-  const imagesStyles = getImageStyles(
-    imageDimensions,
-    translateValue,
-    scaleValue
-  );
+  const imagesStyles = getImageStyles(dimensions, translateValue, scaleValue);
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
     outputRange: [0.7, 1, 0.7],
@@ -108,7 +110,7 @@ const ImageItem = ({
     nativeEvent,
   }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
-
+    onRequestClose();
     scrollValueY.setValue(offsetY);
   };
 
@@ -127,15 +129,13 @@ const ImageItem = ({
         onScrollEndDrag,
       })}
     >
-      <Animated.Image
+      <AnimatedFastImage
         {...panHandlers}
-        source={imageSrc}
-        style={imageStylesWithOpacity}
-        onLoad={onLoaded}
+        resizeMode={resizeMode}
+        source={{ uri: imageSrc?.uri || '', priority: cachePriority }}
+        style={[dimensions, { ...imageStylesWithOpacity }]}
+        defaultSource={require('../../../assets/image.png')}
       />
-      {!isLoaded && (
-        <ImageLoading loadingIndicatorColor={loadingIndicatorColor} />
-      )}
     </ScrollView>
   );
 };

@@ -43,7 +43,7 @@ interface Props {
   FooterComponent?: ComponentType<{ imageIndex: number }>;
   top?: number;
   cachePriority?: Priority;
-  resizeMode: ResizeMode;
+  resizeMode?: ResizeMode;
 }
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
@@ -69,7 +69,7 @@ const ImageView: FC<Props> = ({
   HeaderComponent,
   FooterComponent,
   loadingIndicatorColor = '#000000',
-  cachePriority = 'high',
+  cachePriority = 'normal',
   resizeMode = 'contain',
   top = 0,
 }) => {

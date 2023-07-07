@@ -89,6 +89,8 @@ const [visible, setIsVisible] = useState(false);
 | `FooterComponent`        | Footer component, gets current `imageIndex` as a prop                                               | component, function                                         | false    |
 | `top`                    | Header safeArea Insets                                                                              | number                                                      | false    |
 | `loadingIndicatorColor`  | Loading indicator color                                                                             | string                                                      | false    |
+| `cachePriority`          | Priority level cache                                                                                | `low`, `normal`, `high`                                     | false    |
+| `resizeMode`             | Resize Mode                                                                                         | `contain`, `cover`, `stretch`, `center`                     | false    |
 
 - type ImageSource = {uri: string}
 

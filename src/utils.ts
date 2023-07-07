@@ -1,5 +1,6 @@
 import {
   Animated,
+  Dimensions,
   GestureResponderEvent,
   NativeTouchEvent,
   PanResponder,
@@ -7,6 +8,9 @@ import {
   PanResponderInstance,
 } from 'react-native';
 import type { DimensionsType, Position } from '@types';
+
+const SCREEN = Dimensions.get('window');
+const SCREEN_WIDTH = SCREEN.width;
 
 type CacheStorageItem = { key: string; value: any };
 
@@ -64,7 +68,7 @@ export const getImageStyles = (
   scale?: Animated.Value
 ) => {
   if (!image?.width || !image?.height) {
-    return { width: 0, height: 0 };
+    return { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
   }
 
   const transform = translate.getTranslateTransform();
