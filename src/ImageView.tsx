@@ -69,7 +69,7 @@ const ImageView: FC<Props> = ({
   HeaderComponent,
   FooterComponent,
   loadingIndicatorColor = '#000000',
-  cachePriority = 'high',
+  cachePriority = 'normal',
   resizeMode = 'contain',
   top = 0,
 }) => {

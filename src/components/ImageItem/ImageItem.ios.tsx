@@ -14,7 +14,7 @@ import {
 
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
 import { getImageStyles, getImageTransform } from '../../utils';
-import type { DimensionsType, ImageSource } from '@types';
+import type { ImageSource } from '@types';
 import FastImage, {
   FastImageProps,
   Priority,
@@ -57,8 +57,7 @@ const ImageItem = ({
   );
   const scrollViewRef = useRef<ScrollView>(null);
   const [scaled, setScaled] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [dimensions, setDimensions] = useState<DimensionsType | null>(null);
+  const dimensions = { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
   const scaleValue = new Animated.Value(scale || 1);
@@ -132,17 +131,6 @@ const ImageItem = ({
               { ...imagesStyles },
             ]}
             defaultSource={require('../../../assets/image.png')}
-            onLoad={
-              !loaded
-                ? (event) => {
-                    setDimensions({
-                      width: event?.nativeEvent?.width,
-                      height: event?.nativeEvent?.height,
-                    });
-                    setLoaded(true);
-                  }
-                : undefined
-            }
           />
         </TouchableWithoutFeedback>
       </ScrollView>
