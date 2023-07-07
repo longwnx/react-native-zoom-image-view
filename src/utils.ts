@@ -1,5 +1,4 @@
 import {
-  Animated,
   Dimensions,
   GestureResponderEvent,
   NativeTouchEvent,
@@ -8,6 +7,7 @@ import {
   PanResponderInstance,
 } from 'react-native';
 import type { DimensionsType, Position } from '@types';
+import { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 const SCREEN = Dimensions.get('window');
 const SCREEN_WIDTH = SCREEN.width;
@@ -64,27 +64,29 @@ export const getImageTransform = (
 
 export const getImageStyles = (
   image: DimensionsType | null,
-  translate: Animated.ValueXY,
-  scale?: Animated.Value
+  translate: SharedValue<{ x: number; y: number }>,
+  scale?: SharedValue<number>
 ) => {
   if (!image?.width || !image?.height) {
     return { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
   }
 
-  const transform = translate.getTranslateTransform();
+  const transform = [translate.value];
 
-  if (scale) {
-    transform.push({ scale } as any, {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      perspective: new Animated.Value(1000),
-    });
-  }
+  const transformStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        ...transform,
+        { scale: scale?.value || 1 },
+        { perspective: 10000 },
+      ],
+    };
+  });
 
   return {
     width: image.width,
     height: image.height,
-    transform,
+    transformStyle,
   };
 };
 

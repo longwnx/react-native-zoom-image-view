@@ -11,13 +11,14 @@ import {
 } from 'react-native';
 import usePanResponder from '../../hooks/usePanResponder';
 
-import { getImageStyles, getImageTransform } from '../../utils';
+import { getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
 import FastImage, {
   FastImageProps,
   Priority,
   ResizeMode,
 } from 'react-native-fast-image';
+import useImageStyle from '../../hooks/useImageStyle';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -84,7 +85,11 @@ const ImageItem: FC<Props> = ({
     delayLongPress,
   });
 
-  const imagesStyles = getImageStyles(dimensions, translateValue, scaleValue);
+  const imagesStyles = useImageStyle({
+    translate: translateValue,
+    imageDimensions: dimensions,
+    scale: scaleValue,
+  });
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
     outputRange: [0.7, 1, 0.7],
