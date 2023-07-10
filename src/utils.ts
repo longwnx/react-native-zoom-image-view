@@ -1,5 +1,4 @@
 import {
-  Dimensions,
   GestureResponderEvent,
   NativeTouchEvent,
   PanResponder,
@@ -7,10 +6,6 @@ import {
   PanResponderInstance,
 } from 'react-native';
 import type { DimensionsType, Position } from '@types';
-import { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-
-const SCREEN = Dimensions.get('window');
-const SCREEN_WIDTH = SCREEN.width;
 
 type CacheStorageItem = { key: string; value: any };
 
@@ -60,34 +55,6 @@ export const getImageTransform = (
   const { x, y } = getImageTranslate(image, screen, top);
 
   return [{ x, y }, scale] as const;
-};
-
-export const getImageStyles = (
-  image: DimensionsType | null,
-  translate: SharedValue<{ x: number; y: number }>,
-  scale?: SharedValue<number>
-) => {
-  if (!image?.width || !image?.height) {
-    return { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
-  }
-
-  const transform = [translate.value];
-
-  const transformStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        ...transform,
-        { scale: scale?.value || 1 },
-        { perspective: 10000 },
-      ],
-    };
-  });
-
-  return {
-    width: image.width,
-    height: image.height,
-    transformStyle,
-  };
 };
 
 export const getImageTranslate = (
@@ -171,8 +138,10 @@ export const createPanResponder = ({
   });
 
 export const getDistanceBetweenTouches = (
-  touches: NativeTouchEvent[]
+  touches: NativeTouchEvent[] | null
 ): number => {
+  if (!touches) return 0;
+
   const [a, b] = touches;
 
   if (a == null || b == null) {

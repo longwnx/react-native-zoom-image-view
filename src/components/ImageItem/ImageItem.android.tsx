@@ -1,9 +1,7 @@
 import React, { FC, useCallback, useRef } from 'react';
 
 import {
-  Animated,
   Dimensions,
-  NativeMethodsMixin,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -19,6 +17,12 @@ import FastImage, {
   ResizeMode,
 } from 'react-native-fast-image';
 import useImageStyle from '../../hooks/useImageStyle';
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -55,10 +59,10 @@ const ImageItem: FC<Props> = ({
   const AnimatedFastImage = Animated.createAnimatedComponent(
     FastImage as React.ComponentClass<FastImageProps>
   );
-  const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
+  const imageContainer = useRef<ScrollView>(null);
   const dimensions = { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
-  const scrollValueY = new Animated.Value(0);
+  const scrollValueY = useSharedValue(0);
 
   const onZoomPerformed = useCallback(
     (isZoomed: boolean) => {
@@ -90,11 +94,18 @@ const ImageItem: FC<Props> = ({
     imageDimensions: dimensions,
     scale: scaleValue,
   });
-  const imageOpacity = scrollValueY.interpolate({
-    inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
-    outputRange: [0.7, 1, 0.7],
-  });
-  const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
+
+  const imageOpacity = interpolate(
+    scrollValueY.value,
+    [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
+    [0.7, 1, 0.7],
+    Extrapolate.CLAMP
+  );
+
+  const imageStylesWithOpacity = useAnimatedStyle(
+    () => ({ ...imagesStyles, opacity: imageOpacity }),
+    []
+  );
 
   const onScrollEndDrag = ({
     nativeEvent,
@@ -116,7 +127,7 @@ const ImageItem: FC<Props> = ({
   }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
     onRequestClose();
-    scrollValueY.setValue(offsetY);
+    scrollValueY.value = offsetY;
   };
 
   return (
