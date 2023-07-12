@@ -103,7 +103,7 @@ const ImageItem: FC<Props> = ({
   );
 
   const imageStylesWithOpacity = useAnimatedStyle(
-    () => ({ ...imagesStyles, opacity: imageOpacity }),
+    () => ({ opacity: imageOpacity }),
     []
   );
 
@@ -149,7 +149,7 @@ const ImageItem: FC<Props> = ({
         {...panHandlers}
         resizeMode={resizeMode}
         source={{ uri: imageSrc?.uri || '', priority: cachePriority }}
-        style={[dimensions, { ...imageStylesWithOpacity }]}
+        style={[dimensions, imageStylesWithOpacity, imagesStyles]}
         defaultSource={require('../../../assets/image.png')}
       />
     </ScrollView>

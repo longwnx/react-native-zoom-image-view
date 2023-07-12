@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import {
   Dimensions,
-  Modal,
   ModalProps,
   StyleSheet,
   View,
@@ -46,7 +45,7 @@ interface Props {
   resizeMode?: ResizeMode;
 }
 
-const DEFAULT_ANIMATION_TYPE = 'fade';
+// const DEFAULT_ANIMATION_TYPE = 'fade';
 const DEFAULT_BG_COLOR = '#000';
 const DEFAULT_DELAY_LONG_PRESS = 800;
 const SCREEN = Dimensions.get('screen');
@@ -56,13 +55,10 @@ const ImageView: FC<Props> = ({
   images,
   keyExtractor,
   imageIndex,
-  visible,
   onRequestClose,
   onLongPress = () => undefined,
   onImageIndexChange,
-  animationType = DEFAULT_ANIMATION_TYPE,
   backgroundColor = DEFAULT_BG_COLOR,
-  presentationStyle,
   swipeToCloseEnabled,
   doubleTapToZoomEnabled,
   delayLongPress = DEFAULT_DELAY_LONG_PRESS,
@@ -94,81 +90,67 @@ const ImageView: FC<Props> = ({
     [toggleVisible]
   );
 
-  if (!visible) {
-    return null;
-  }
-
   return (
-    <Modal
-      transparent={presentationStyle === 'overFullScreen'}
-      visible={visible}
-      presentationStyle={presentationStyle}
-      animationType={animationType}
-      onRequestClose={onRequestCloseEnhanced}
-      supportedOrientations={['portrait']}
-      hardwareAccelerated
-    >
-      <View style={[styles.container, { opacity, backgroundColor }]}>
-        <Animated.View style={[styles.header, headerStyle]}>
-          {typeof HeaderComponent !== 'undefined' ? (
-            React.createElement(HeaderComponent, {
-              imageIndex: currentImageIndex,
-            })
-          ) : (
-            <ImageDefaultHeader
-              images={images}
-              activeIndex={currentImageIndex}
-              onRequestClose={onRequestCloseEnhanced}
-            />
-          )}
-        </Animated.View>
-        <VirtualizedList
-          ref={imageList}
-          data={images}
-          horizontal
-          pagingEnabled
-          windowSize={2}
-          initialNumToRender={1}
-          maxToRenderPerBatch={1}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          initialScrollIndex={imageIndex}
-          getItem={(_: any, index: number) => images[index]}
-          getItemCount={() => images.length}
-          getItemLayout={(_: any, index: number) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
-            index,
-          })}
-          renderItem={({ item: imageSrc }: { item: ImageSource }) => (
-            <ImageItem
-              loadingIndicatorColor={loadingIndicatorColor}
-              onZoom={onZoom}
-              imageSrc={imageSrc}
-              onRequestClose={onRequestCloseEnhanced}
-              onLongPress={onLongPress}
-              delayLongPress={delayLongPress}
-              swipeToCloseEnabled={swipeToCloseEnabled}
-              doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-              top={top}
-              cachePriority={cachePriority}
-              resizeMode={resizeMode}
-            />
-          )}
-          onMomentumScrollEnd={onScroll}
-          keyExtractor={(imageSrc: ImageSource, index: number) =>
-            keyExtractor ? keyExtractor(imageSrc, index) : imageSrc.uri
-          }
-        />
-        {typeof FooterComponent !== 'undefined' && (
-          <Animated.View style={[styles.footer, footerStyle]}>
-            {React.createElement(FooterComponent, {
-              imageIndex: currentImageIndex,
-            })}
-          </Animated.View>
+    <View style={[styles.container, { opacity, backgroundColor }]}>
+      <Animated.View style={[styles.header, headerStyle]}>
+        {typeof HeaderComponent !== 'undefined' ? (
+          React.createElement(HeaderComponent, {
+            imageIndex: currentImageIndex,
+          })
+        ) : (
+          <ImageDefaultHeader
+            images={images}
+            activeIndex={currentImageIndex}
+            onRequestClose={onRequestCloseEnhanced}
+          />
         )}
-      </View>
-    </Modal>
+      </Animated.View>
+      <VirtualizedList
+        ref={imageList}
+        data={images}
+        horizontal
+        pagingEnabled
+        windowSize={2}
+        initialNumToRender={1}
+        maxToRenderPerBatch={1}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        initialScrollIndex={imageIndex}
+        getItem={(_: any, index: number) => images[index]}
+        getItemCount={() => images.length}
+        getItemLayout={(_: any, index: number) => ({
+          length: SCREEN_WIDTH,
+          offset: SCREEN_WIDTH * index,
+          index,
+        })}
+        renderItem={({ item: imageSrc }: { item: ImageSource }) => (
+          <ImageItem
+            loadingIndicatorColor={loadingIndicatorColor}
+            onZoom={onZoom}
+            imageSrc={imageSrc}
+            onRequestClose={onRequestCloseEnhanced}
+            onLongPress={onLongPress}
+            delayLongPress={delayLongPress}
+            swipeToCloseEnabled={swipeToCloseEnabled}
+            doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+            top={top}
+            cachePriority={cachePriority}
+            resizeMode={resizeMode}
+          />
+        )}
+        onMomentumScrollEnd={onScroll}
+        keyExtractor={(imageSrc: ImageSource, index: number) =>
+          keyExtractor ? keyExtractor(imageSrc, index) : imageSrc.uri
+        }
+      />
+      {typeof FooterComponent !== 'undefined' && (
+        <Animated.View style={[styles.footer, footerStyle]}>
+          {React.createElement(FooterComponent, {
+            imageIndex: currentImageIndex,
+          })}
+        </Animated.View>
+      )}
+    </View>
   );
 };
 

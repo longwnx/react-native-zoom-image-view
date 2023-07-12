@@ -29,7 +29,7 @@ const ImageDefaultHeader: FC<Props> = ({
         onPress={onRequestClose}
       >
         <FastImage
-          source={require('assets/icons/ic_XBack.png')}
+          source={require('../../assets/ic_XBack.png')}
           style={{ width: 18, height: 18 }}
         />
       </TouchableOpacity>
