@@ -1,9 +1,7 @@
 import React, { FC, useCallback, useRef } from 'react';
 
 import {
-  Animated,
   Dimensions,
-  NativeMethodsMixin,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -11,13 +9,21 @@ import {
 } from 'react-native';
 import usePanResponder from '../../hooks/usePanResponder';
 
-import { getImageStyles, getImageTransform } from '../../utils';
+import { getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
 import FastImage, {
   FastImageProps,
   Priority,
   ResizeMode,
 } from 'react-native-fast-image';
+import Animated, {
+  Easing,
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -54,10 +60,10 @@ const ImageItem: FC<Props> = ({
   const AnimatedFastImage = Animated.createAnimatedComponent(
     FastImage as React.ComponentClass<FastImageProps>
   );
-  const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
+  const imageContainer = useRef<ScrollView>(null);
   const dimensions = { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
-  const scrollValueY = new Animated.Value(0);
+  const scrollValueY = useSharedValue(0);
 
   const onZoomPerformed = useCallback(
     (isZoomed: boolean) => {
@@ -84,12 +90,42 @@ const ImageItem: FC<Props> = ({
     delayLongPress,
   });
 
-  const imagesStyles = getImageStyles(dimensions, translateValue, scaleValue);
-  const imageOpacity = scrollValueY.interpolate({
-    inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
-    outputRange: [0.7, 1, 0.7],
+  const imagesStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withTiming(scaleValue.value, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateX: withTiming(translateValue.value.x, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateY: withTiming(translateValue.value.y, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+      ],
+    };
   });
-  const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
+
+  const imageOpacity = interpolate(
+    scrollValueY.value,
+    [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
+    [0.7, 1, 0.7],
+    Extrapolate.CLAMP
+  );
+
+  const imageStylesWithOpacity = useAnimatedStyle(
+    () => ({ opacity: imageOpacity }),
+    []
+  );
 
   const onScrollEndDrag = ({
     nativeEvent,
@@ -111,7 +147,7 @@ const ImageItem: FC<Props> = ({
   }: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = nativeEvent?.contentOffset?.y ?? 0;
     onRequestClose();
-    scrollValueY.setValue(offsetY);
+    scrollValueY.value = offsetY;
   };
 
   return (
@@ -133,7 +169,7 @@ const ImageItem: FC<Props> = ({
         {...panHandlers}
         resizeMode={resizeMode}
         source={{ uri: imageSrc?.uri || '', priority: cachePriority }}
-        style={[dimensions, { ...imageStylesWithOpacity }]}
+        style={[dimensions, imageStylesWithOpacity, imagesStyles]}
         defaultSource={require('../../../assets/image.png')}
       />
     </ScrollView>

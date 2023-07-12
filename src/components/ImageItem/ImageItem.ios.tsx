@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import {
-  Animated,
   Dimensions,
   GestureResponderEvent,
   NativeScrollEvent,
@@ -13,7 +12,7 @@ import {
 } from 'react-native';
 
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
-import { getImageStyles, getImageTransform } from '../../utils';
+import { getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
 import { DimensionsType } from '@types';
 import FastImage, {
@@ -21,6 +20,12 @@ import FastImage, {
   Priority,
   ResizeMode,
 } from 'react-native-fast-image';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 const SWIPE_CLOSE_VELOCITY = 1.55;
 const SCREEN = Dimensions.get('screen');
@@ -59,17 +64,40 @@ const ImageItem = ({
   const [loaded, setLoaded] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const [scaled, setScaled] = useState(false);
-  const [dimensions, setDimensions] = useState<DimensionsType | null>({
+  const [dimensions, setDimensions] = useState<DimensionsType>({
     width: SCREEN_WIDTH,
     height: (SCREEN_WIDTH * 16) / 9,
   });
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
   const [translate, scale] = getImageTransform(dimensions, SCREEN, top);
-  const scaleValue = new Animated.Value(scale || 1);
-  const translateValue = new Animated.ValueXY(translate);
+  const scaleValue = useSharedValue(scale || 1);
+  const translateValue = useSharedValue(translate || { x: 0, y: 0 });
   const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
 
-  const imagesStyles = getImageStyles(dimensions, translateValue, scaleValue);
+  const imagesStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withTiming(scaleValue.value, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateX: withTiming(translateValue.value.x, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateY: withTiming(translateValue.value.y, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+      ],
+    };
+  });
 
   const onScrollEndDrag = useCallback(
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {

@@ -1,6 +1,4 @@
 import {
-  Animated,
-  Dimensions,
   GestureResponderEvent,
   NativeTouchEvent,
   PanResponder,
@@ -8,9 +6,6 @@ import {
   PanResponderInstance,
 } from 'react-native';
 import type { DimensionsType, Position } from '@types';
-
-const SCREEN = Dimensions.get('window');
-const SCREEN_WIDTH = SCREEN.width;
 
 type CacheStorageItem = { key: string; value: any };
 
@@ -60,32 +55,6 @@ export const getImageTransform = (
   const { x, y } = getImageTranslate(image, screen, top);
 
   return [{ x, y }, scale] as const;
-};
-
-export const getImageStyles = (
-  image: DimensionsType | null,
-  translate: Animated.ValueXY,
-  scale?: Animated.Value
-) => {
-  if (!image?.width || !image?.height) {
-    return { width: SCREEN_WIDTH, height: (SCREEN_WIDTH * 16) / 9 };
-  }
-
-  const transform = translate.getTranslateTransform();
-
-  if (scale) {
-    transform.push({ scale } as any, {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      perspective: new Animated.Value(1000),
-    });
-  }
-
-  return {
-    width: image.width,
-    height: image.height,
-    transform,
-  };
 };
 
 export const getImageTranslate = (
@@ -169,8 +138,10 @@ export const createPanResponder = ({
   });
 
 export const getDistanceBetweenTouches = (
-  touches: NativeTouchEvent[]
+  touches: NativeTouchEvent[] | null
 ): number => {
+  if (!touches) return 0;
+
   const [a, b] = touches;
 
   if (a == null || b == null) {
