@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
-import useImageStyles from '../../hooks/useImageStyle';
 import { getImageTransform } from '../../utils';
 import type { ImageSource } from '@types';
 import { DimensionsType } from '@types';
@@ -21,7 +20,12 @@ import FastImage, {
   Priority,
   ResizeMode,
 } from 'react-native-fast-image';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 const SWIPE_CLOSE_VELOCITY = 1.55;
 const SCREEN = Dimensions.get('screen');
@@ -70,10 +74,29 @@ const ImageItem = ({
   const translateValue = useSharedValue(translate || { x: 0, y: 0 });
   const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
 
-  const imagesStyles = useImageStyles({
-    imageDimensions: dimensions,
-    scale: scaleValue,
-    translate: translateValue,
+  const imagesStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withTiming(scaleValue.value, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateX: withTiming(translateValue.value.x, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateY: withTiming(translateValue.value.y, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+      ],
+    };
   });
 
   const onScrollEndDrag = useCallback(

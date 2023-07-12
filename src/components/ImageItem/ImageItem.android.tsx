@@ -16,12 +16,13 @@ import FastImage, {
   Priority,
   ResizeMode,
 } from 'react-native-fast-image';
-import useImageStyle from '../../hooks/useImageStyle';
 import Animated, {
+  Easing,
   Extrapolate,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 
 const SWIPE_CLOSE_OFFSET = 75;
@@ -89,10 +90,29 @@ const ImageItem: FC<Props> = ({
     delayLongPress,
   });
 
-  const imagesStyles = useImageStyle({
-    translate: translateValue,
-    imageDimensions: dimensions,
-    scale: scaleValue,
+  const imagesStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withTiming(scaleValue.value, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateX: withTiming(translateValue.value.x, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+        {
+          translateY: withTiming(translateValue.value.y, {
+            duration: 300,
+            easing: Easing.linear,
+          }),
+        },
+      ],
+    };
   });
 
   const imageOpacity = interpolate(
