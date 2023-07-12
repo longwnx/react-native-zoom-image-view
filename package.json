@@ -1,6 +1,6 @@
 {
   "name": "react-native-zoom-image-view",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "react-native-zoom-image-view",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
